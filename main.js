@@ -1,0 +1,94 @@
+// ── CONFIG ──
+const SUPABASE_URL = 'https://iisfqcyynckwojplgyxn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_AQ__x3vlBbEYjlFbw4niLw_33M-onUX';
+
+// ── NAVBAR: scroll border + mobile toggle ──
+const navbar   = document.getElementById('navbar');
+const navLinks = document.getElementById('navLinks');
+const toggle   = document.getElementById('mobileToggle');
+
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 10);
+});
+
+toggle.addEventListener('click', () => {
+  const open = navLinks.classList.toggle('open');
+  toggle.textContent = open ? '✕' : '☰';
+});
+
+// Close mobile menu on link click
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    navLinks.classList.remove('open');
+    toggle.textContent = '☰';
+  });
+});
+
+// ── TOAST utility ──
+function showToast(msg, duration = 3500) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// ── WAITLIST FORM → Supabase ──
+const form = document.getElementById('waitlistForm');
+const msg  = document.getElementById('waitlistMsg');
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email  = document.getElementById('waitlistEmail').value.trim();
+  const button = form.querySelector('button');
+
+  button.textContent = '...';
+  button.disabled = true;
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify({ email })
+    });
+
+    if (res.ok) {
+      form.style.display = 'none';
+      msg.style.display  = 'block';
+      showToast('Danke! Sie stehen auf der Liste.');
+    } else if (res.status === 409) {
+      // unique constraint — already signed up
+      showToast('Diese E-Mail-Adresse ist bereits eingetragen.');
+      button.textContent = 'Updates erhalten';
+      button.disabled = false;
+    } else {
+      throw new Error(`Status ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Waitlist error:', err);
+    showToast('Etwas hat nicht geklappt. Bitte versuchen Sie es erneut.');
+    button.textContent = 'Updates erhalten';
+    button.disabled = false;
+  }
+});
+
+// ── SCROLL ANIMATION: fade-in on enter ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.problem-card, .solution-card, .step, .persona-card').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
