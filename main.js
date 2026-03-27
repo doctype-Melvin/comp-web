@@ -76,6 +76,92 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+// ── CONTACT MODAL ──
+const overlay       = document.getElementById('contactOverlay');
+const openContact   = document.getElementById('openContact');
+const modalClose    = document.getElementById('modalClose');
+const contactSubmit = document.getElementById('contactSubmit');
+const charCount     = document.getElementById('charCount');
+const contactMsg    = document.getElementById('contactMessage');
+const modalForm     = document.getElementById('modalForm');
+const modalSuccess  = document.getElementById('modalSuccess');
+
+function openModal() {
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  overlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+openContact.addEventListener('click', (e) => { e.preventDefault(); openModal(); });
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// Character counter
+contactMsg.addEventListener('input', () => {
+  const len = contactMsg.value.length;
+  charCount.textContent = `${len} / 500`;
+  charCount.classList.toggle('warn', len >= 400 && len < 500);
+  charCount.classList.toggle('over', len >= 500);
+});
+
+// Contact form submit → Supabase
+contactSubmit.addEventListener('click', async () => {
+  const name     = document.getElementById('contactName').value.trim();
+  const email    = document.getElementById('contactEmail').value.trim();
+  const position = document.getElementById('contactPosition').value.trim();
+  const message  = contactMsg.value.trim();
+
+  if (!name || !email || !message) {
+    showToast('Bitte füllen Sie alle Pflichtfelder aus.');
+    return;
+  }
+
+  contactSubmit.textContent = '...';
+  contactSubmit.disabled = true;
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer':        'return=minimal'
+      },
+      body: JSON.stringify({ name, email, position: position || null, message })
+    });
+
+    if (res.ok) {
+      modalForm.style.display    = 'none';
+      modalSuccess.style.display = 'block';
+      setTimeout(closeModal, 2800);
+      // reset for next time
+      setTimeout(() => {
+        modalForm.style.display    = 'block';
+        modalSuccess.style.display = 'none';
+        document.getElementById('contactName').value     = '';
+        document.getElementById('contactEmail').value    = '';
+        document.getElementById('contactPosition').value = '';
+        contactMsg.value = '';
+        charCount.textContent = '0 / 500';
+        contactSubmit.textContent = 'Nachricht senden';
+        contactSubmit.disabled = false;
+      }, 3200);
+    } else {
+      throw new Error(`Status ${res.status}`);
+    }
+  } catch (err) {
+    console.error('Contact error:', err);
+    showToast('Etwas hat nicht geklappt. Bitte versuchen Sie es erneut.');
+    contactSubmit.textContent = 'Nachricht senden';
+    contactSubmit.disabled = false;
+  }
+});
+
 // ── SCROLL TO TOP ──
 const scrollTopBtn = document.getElementById('scrollTop');
 
