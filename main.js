@@ -76,6 +76,17 @@ form.addEventListener('submit', async (e) => {
   }
 });
 
+// ── SCROLL TO TOP ──
+const scrollTopBtn = document.getElementById('scrollTop');
+
+window.addEventListener('scroll', () => {
+  scrollTopBtn.classList.toggle('visible', window.scrollY > 400);
+});
+
+scrollTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
 // ── SCROLL ANIMATION: fade-in on enter ──
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
