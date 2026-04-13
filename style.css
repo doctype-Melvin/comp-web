@@ -339,25 +339,25 @@ p  { color: var(--text-muted); line-height: 1.7; }
   font-size: 0.875rem;
 }
 .screen-1 {
-  width: 72%; height: 75%;
+  width: 64%; height: 70%;
   top: 0; left: 0; z-index: 3;
   animation: float1 6s ease-in-out infinite;
 }
 .screen-2 {
   width: 65%; height: 65%;
-  top: 15%; right: 0; z-index: 2;
+  top: 30%; right: 0; z-index: 2;
   animation: float2 6s ease-in-out infinite;
   border-color: var(--accent);
   box-shadow: 0 0 40px var(--accent-glow), 0 24px 64px rgba(0,0,0,0.5);
 }
 .screen-3 {
   width: 50%; height: 40%;
-  bottom: 0; left: 15%; z-index: 1;
+  bottom: 0; left: 10%; z-index: 1;
   animation: float3 6s ease-in-out infinite;
 }
-@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes float1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 @keyframes float2 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
-@keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+@keyframes float3 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
 .screen img { width: 100%; height: 100%; object-fit: cover; }
 .demo-cta { text-align: center; }
 .demo-cta p { margin-bottom: 1rem; }
@@ -388,6 +388,11 @@ p  { color: var(--text-muted); line-height: 1.7; }
   margin-bottom: 0.5rem;
 }
 .persona-card h3 { color: var(--text); margin-bottom: 0.5rem; }
+
+/* -- CLAIM -- */
+#claim {
+  text-align: center;
+}
 
 /* ── CTA SECTION ── */
 #cta { position: relative; overflow: hidden; }
